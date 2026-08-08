@@ -1,0 +1,599 @@
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: 'Segoe UI', sans-serif;
+    }
+
+    body {
+        height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        background: linear-gradient(135deg, #5b4bdb, #3b82f6);
+        overflow: hidden;
+    }
+
+    /* Background Circles */
+
+    body::before {
+        content: "";
+        position: absolute;
+        width: 280px;
+        height: 280px;
+        background: rgba(255, 255, 255, .08);
+        border-radius: 50%;
+        top: -80px;
+        left: -80px;
+    }
+
+    body::after {
+        content: "";
+        position: absolute;
+        width: 320px;
+        height: 320px;
+        background: rgba(255, 255, 255, .08);
+        border-radius: 50%;
+        bottom: -100px;
+        right: -100px;
+    }
+
+    .container {
+        width: 900px;
+        background: rgba(255, 255, 255, .12);
+        backdrop-filter: blur(18px);
+        border-radius: 25px;
+        padding: 35px;
+        box-shadow: 0 15px 35px rgba(0, 0, 0, .3);
+        color: white;
+    }
+
+    .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+    }
+
+    .header h1 {
+        font-size: 32px;
+    }
+
+    .timer {
+        background: #ff4d6d;
+        padding: 10px 22px;
+        border-radius: 30px;
+        font-size: 22px;
+        font-weight: bold;
+        box-shadow: 0 5px 15px rgba(255, 77, 109, .4);
+    }
+
+    /* Paragraph */
+
+    .paragraph {
+        background: rgba(255, 255, 255, .15);
+        padding: 20px;
+        border-radius: 15px;
+        line-height: 1.8;
+        font-size: 18px;
+        margin-bottom: 25px;
+
+        user-select: none;
+        -webkit-user-select: none;
+
+        height: 130px;
+        overflow-y: auto;
+    }
+
+    /* Individual words */
+
+    .word {
+        display: inline-block;
+        margin-right: 7px;
+        padding: 2px 4px;
+        border-radius: 5px;
+        transition: all 0.15s ease;
+    }
+
+    /* Current word */
+
+    .word.current {
+        background: rgba(255, 255, 255, 0.25);
+        box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Correct word */
+
+    .word.correct {
+        color: #39ff88;
+        background: rgba(57, 255, 136, 0.12);
+    }
+
+    /* Wrong word */
+
+    .word.wrong {
+        color: #ff4d6d;
+        background: rgba(255, 77, 109, 0.15);
+    }
+
+    /* Current word when typing */
+
+    .word.typing {
+        color: #ffd43b;
+        background: rgba(255, 212, 59, 0.15);
+    }
+
+    textarea {
+        width: 100%;
+        height: 180px;
+
+        padding: 18px;
+
+        border: none;
+        border-radius: 15px;
+
+        font-size: 17px;
+
+        outline: none;
+        resize: none;
+
+        margin-bottom: 25px;
+
+        /* Prevent selecting typed text */
+        user-select: none;
+        -webkit-user-select: none;
+    }
+
+    textarea:focus {
+        box-shadow: 0 0 0 3px rgba(255, 212, 59, 0.5);
+    }
+
+    button {
+        width: 100%;
+        padding: 16px;
+        border: none;
+        border-radius: 15px;
+        background: #FFD43B;
+        font-size: 20px;
+        font-weight: bold;
+        cursor: pointer;
+        transition: .3s;
+    }
+
+    button:hover {
+        transform: scale(1.03);
+        background: #FFC107;
+    }
+</style>
+
+
+<div class="container">
+
+    <div class="header">
+
+        <h1>⌨️ Typing Speed Challenge</h1>
+
+        <div class="timer">
+            ⏱ <span id="timer"></span>
+        </div>
+
+    </div>
+
+
+    <form action="/result" method="POST" id="typingForm">
+
+        <!-- Paragraph -->
+        <div class="paragraph" id="paragraph"></div>
+
+
+        <!-- Typing area -->
+        <textarea
+            id="typingArea"
+            name="typed_text"
+            placeholder="Start typing the paragraph here..."
+            autocomplete="off"
+            autocorrect="off"
+            autocapitalize="off"
+            spellcheck="false"
+            required></textarea>
+
+
+        <input type="hidden"
+               name="paragraph"
+               value="{{ paragraph }}">
+
+        <input type="hidden"
+               name="duration"
+               value="{{ duration }}">
+
+
+        <button type="submit">
+            🚀 Submit Test
+        </button>
+
+    </form>
+
+</div>
+
+
+<script>
+
+    /* =====================================================
+       GET ORIGINAL PARAGRAPH
+    ===================================================== */
+
+    const originalText = {{ paragraph | tojson }};
+
+
+    /* =====================================================
+       CREATE WORDS
+    ===================================================== */
+
+    const paragraphElement = document.getElementById("paragraph");
+
+    const originalWords = originalText.trim().split(/\s+/);
+
+    originalWords.forEach(function(word, index) {
+
+        const span = document.createElement("span");
+
+        span.classList.add("word");
+
+        span.textContent = word;
+
+        span.dataset.index = index;
+
+        paragraphElement.appendChild(span);
+
+    });
+
+
+    const wordElements =
+        document.querySelectorAll(".word");
+
+
+    /* =====================================================
+       TYPING AREA
+    ===================================================== */
+
+    const typingArea =
+        document.getElementById("typingArea");
+
+
+    /* =====================================================
+       PREVENT GOING BACK
+    ===================================================== */
+
+    typingArea.addEventListener("keydown", function(event) {
+
+        /*
+         * These keys can move the cursor backward
+         * or delete previous text.
+         */
+
+        const forbiddenKeys = [
+            "Backspace",
+            "Delete",
+            "ArrowLeft",
+            "ArrowRight",
+            "ArrowUp",
+            "ArrowDown",
+            "Home",
+            "End"
+        ];
+
+
+        if (forbiddenKeys.includes(event.key)) {
+
+            event.preventDefault();
+
+            return;
+
+        }
+
+
+        /*
+         * Prevent Ctrl+A
+         */
+
+        if (event.ctrlKey && event.key.toLowerCase() === "a") {
+
+            event.preventDefault();
+
+            return;
+
+        }
+
+
+        /*
+         * Prevent Ctrl+X
+         */
+
+        if (event.ctrlKey && event.key.toLowerCase() === "x") {
+
+            event.preventDefault();
+
+            return;
+
+        }
+
+
+        /*
+         * Prevent Ctrl+V
+         */
+
+        if (event.ctrlKey && event.key.toLowerCase() === "v") {
+
+            event.preventDefault();
+
+            return;
+
+        }
+
+
+        /*
+         * Prevent Ctrl+Z
+         */
+
+        if (event.ctrlKey && event.key.toLowerCase() === "z") {
+
+            event.preventDefault();
+
+            return;
+
+        }
+
+    });
+
+
+    /* =====================================================
+       PREVENT PASTE
+    ===================================================== */
+
+    typingArea.addEventListener("paste", function(event) {
+
+        event.preventDefault();
+
+    });
+
+
+    /* =====================================================
+       PREVENT CUT
+    ===================================================== */
+
+    typingArea.addEventListener("cut", function(event) {
+
+        event.preventDefault();
+
+    });
+
+
+    /* =====================================================
+       CHECK TYPING
+    ===================================================== */
+
+    typingArea.addEventListener("input", function() {
+
+        const typedText = typingArea.value;
+
+
+        /*
+         * Get typed words
+         */
+
+        const typedWords =
+            typedText.trim().split(/\s+/);
+
+
+        /*
+         * If textarea is empty
+         */
+
+        if (typedText.trim() === "") {
+
+            wordElements.forEach(function(word) {
+
+                word.className = "word";
+
+            });
+
+            return;
+
+        }
+
+
+        /*
+         * Find current word
+         */
+
+        let currentIndex = typedWords.length - 1;
+
+
+        /*
+         * Check every typed word
+         */
+
+        wordElements.forEach(function(wordElement, index) {
+
+            wordElement.className = "word";
+
+
+            /*
+             * Word has already been completed
+             */
+
+            if (index < currentIndex) {
+
+                if (typedWords[index] === originalWords[index]) {
+
+                    wordElement.classList.add("correct");
+
+                } else {
+
+                    wordElement.classList.add("wrong");
+
+                }
+
+            }
+
+
+            /*
+             * Current word
+             */
+
+            else if (index === currentIndex) {
+
+                const typedWord =
+                    typedWords[index];
+
+                const originalWord =
+                    originalWords[index];
+
+
+                /*
+                 * Exact match
+                 */
+
+                if (typedWord === originalWord) {
+
+                    wordElement.classList.add("correct");
+
+                }
+
+
+                /*
+                 * User is typing the correct word
+                 */
+
+                else if (
+                    originalWord.startsWith(typedWord)
+                ) {
+
+                    wordElement.classList.add("typing");
+
+                }
+
+
+                /*
+                 * Wrong word
+                 */
+
+                else {
+
+                    wordElement.classList.add("wrong");
+
+                }
+
+
+                /*
+                 * Highlight current word
+                 */
+
+                wordElement.classList.add("current");
+
+            }
+
+        });
+
+
+        /*
+         * Scroll current word into view
+         */
+
+        if (wordElements[currentIndex]) {
+
+            wordElements[currentIndex].scrollIntoView({
+                behavior: "smooth",
+                block: "center"
+            });
+
+        }
+
+    });
+
+
+    /* =====================================================
+       KEEP CURSOR AT END
+    ===================================================== */
+
+    typingArea.addEventListener("click", function() {
+
+        typingArea.setSelectionRange(
+            typingArea.value.length,
+            typingArea.value.length
+        );
+
+    });
+
+
+    typingArea.addEventListener("mouseup", function() {
+
+        typingArea.setSelectionRange(
+            typingArea.value.length,
+            typingArea.value.length
+        );
+
+    });
+
+
+    /* =====================================================
+       TIMER
+    ===================================================== */
+
+    let time = Number("{{ duration }}") * 60;
+
+    const timer =
+        document.getElementById("timer");
+
+
+    const countdown = setInterval(function() {
+
+        let min =
+            Math.floor(time / 60);
+
+        let sec =
+            time % 60;
+
+
+        timer.innerHTML =
+            min + ":" +
+            (sec < 10 ? "0" : "") +
+            sec;
+
+
+        time--;
+
+
+        /*
+         * Time finished
+         */
+
+        if (time < 0) {
+
+            clearInterval(countdown);
+
+            document.getElementById("typingForm").submit();
+
+        }
+
+    }, 1000);
+
+
+    /* =====================================================
+       START TIMER DISPLAY IMMEDIATELY
+    ===================================================== */
+
+    let initialMin =
+        Math.floor((Number("{{ duration }}") * 60) / 60);
+
+    let initialSec =
+        (Number("{{ duration }}") * 60) % 60;
+
+    timer.innerHTML =
+        initialMin + ":" +
+        (initialSec < 10 ? "0" : "") +
+        initialSec;
+
+
+</script>

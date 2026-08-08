@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Typing Speed Dashboard</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;500;700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: Poppins, sans-serif;
+        }
+
+        body {
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            background: linear-gradient(135deg, #2b3a67, #465cc8, #7388ff);
+            background-size: 300% 300%;
+            animation: bg 12s infinite alternate;
+        }
+
+        @keyframes bg {
+            0% {
+                background-position: left;
+            }
+
+            100% {
+                background-position: right;
+            }
+        }
+
+        .circle1,
+        .circle2 {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, .08);
+            filter: blur(5px);
+        }
+
+        .circle1 {
+            width: 280px;
+            height: 280px;
+            top: -70px;
+            left: -80px;
+        }
+
+        .circle2 {
+            width: 350px;
+            height: 350px;
+            bottom: -120px;
+            right: -100px;
+        }
+
+        .container {
+
+            width: 900px;
+            padding: 40px;
+            border-radius: 30px;
+
+            background: rgba(255, 255, 255, .12);
+
+            backdrop-filter: blur(18px);
+
+            box-shadow: 0 20px 50px rgba(0, 0, 0, .35);
+
+            text-align: center;
+
+        }
+
+        .icon {
+
+            font-size: 70px;
+
+            margin-bottom: 10px;
+
+        }
+
+        h1 {
+
+            color: white;
+
+            font-size: 38px;
+
+            margin-bottom: 10px;
+
+        }
+
+        .subtitle {
+
+            color: #e8e8e8;
+
+            margin-bottom: 35px;
+
+        }
+
+        .cards {
+
+            display: flex;
+
+            justify-content: center;
+
+            gap: 25px;
+
+            margin-bottom: 40px;
+
+        }
+
+        .card {
+
+            width: 180px;
+
+            padding: 25px;
+
+            border-radius: 20px;
+
+            background: rgba(255, 255, 255, .15);
+
+            cursor: pointer;
+
+            transition: .4s;
+
+            color: white;
+
+            box-shadow: 0 12px 25px rgba(0, 0, 0, .2);
+
+        }
+
+        .card:hover {
+
+            transform: translateY(-10px) scale(1.05);
+
+            background: rgba(255, 255, 255, .22);
+
+        }
+
+        .card h2 {
+
+            font-size: 22px;
+
+            margin-bottom: 10px;
+
+        }
+
+        .card p {
+
+            font-size: 14px;
+
+        }
+
+        button {
+
+            padding: 18px 70px;
+
+            font-size: 20px;
+
+            border: none;
+
+            border-radius: 18px;
+
+            background: #ff6b6b;
+
+            color: white;
+
+            cursor: pointer;
+
+            font-weight: bold;
+
+            transition: .3s;
+
+            box-shadow: 0 15px 30px rgba(255, 107, 107, .4);
+
+        }
+
+        button:hover {
+
+            transform: scale(1.08);
+
+            background: #ff4c4c;
+
+        }
+    </style>
+
+</head>
+
+<body>
+
+    <div class="circle1"></div>
+
+    <div class="circle2"></div>
+
+    <div class="container">
+
+        <div class="icon">⌨️</div>
+
+        <h1>Typing Speed Game</h1>
+
+        <p class="subtitle">
+            Challenge yourself and improve your typing speed.
+            Choose your preferred duration and begin.
+        </p>
+
+        <form action="/start" method="POST">
+
+
+
+            <div class="cards">
+
+                <label>
+
+                    <input type="radio" name="duration" value="1" hidden >
+
+                    <div class="card">
+
+                        <h2>1 Minute</h2>
+
+                        <p>Quick Challenge</p>
+
+                    </div>
+
+                </label>
+
+                <label>
+
+                    <input type="radio" name="duration" value="2" hidden>
+
+                    <div class="card">
+
+                        <h2>2 Minutes</h2>
+
+                        <p>Balanced Mode</p>
+
+                    </div>
+
+                </label>
+
+                <label>
+
+                    <input type="radio" name="duration" value="5" hidden>
+
+                    <div class="card">
+
+                        <h2>5 Minutes</h2>
+
+                        <p>Pro Challenge</p>
+
+                    </div>
+
+                </label>
+
+            </div>
+
+
+
+            <button type="submit">🚀 Start Game</button>
+
+        </form>
+
+    </div>
+
+</body>
+
+</html>

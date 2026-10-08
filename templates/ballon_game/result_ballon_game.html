@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Balloon Game Result</title>
+
+    <style>
+
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(
+                135deg,
+                #2b3a67,
+                #465cc8,
+                #7388ff
+            );
+            color: white;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .result-box {
+            width: 400px;
+            padding: 40px;
+            text-align: center;
+            background: rgba(255, 255, 255, 0.15);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+        }
+
+        h1 {
+            margin-bottom: 30px;
+        }
+
+        .score {
+            font-size: 50px;
+            font-weight: bold;
+            margin: 20px;
+        }
+
+        .details {
+            font-size: 20px;
+            line-height: 2;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 25px;
+            padding: 12px 25px;
+            background: #ff6b6b;
+            color: white;
+            text-decoration: none;
+            border-radius: 10px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+    <div class="result-box">
+
+        <h1>🎈 Game Over!</h1>
+
+        <div class="score">
+            {{ score }}
+        </div>
+
+        <div class="details">
+
+            <div>
+                Correct Words:
+                {{ correct_words }}
+            </div>
+
+            <div>
+                Wrong Attempts:
+                {{ wrong_words }}
+            </div>
+
+        </div>
+
+        <a href="/dashboard" class="btn">
+            Play Again
+        </a>
+
+        <br>
+
+        <a href="/profile" class="btn">
+            Profile
+        </a>
+
+    </div>
+
+</body>
+
+</html>

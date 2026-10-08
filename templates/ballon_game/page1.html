@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>Balloon Game</title>
+
+    <style>
+        body {
+            margin: 0;
+            overflow: hidden;
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #2b3a67, #465cc8, #7388ff);
+            color: white;
+        }
+
+        .game-header {
+            text-align: center;
+            padding: 20px;
+        }
+
+        .game-header h1 {
+            margin: 5px;
+            font-size: 32px;
+        }
+
+        .score {
+            font-size: 22px;
+            margin-top: 10px;
+        }
+
+        .game-area {
+            position: relative;
+            height: calc(100vh - 150px);
+            overflow: hidden;
+        }
+
+        .balloon {
+            position: absolute;
+            width: 110px;
+            height: 135px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 16px;
+            color: white;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
+        }
+
+        .balloon::after {
+            content: "";
+            position: absolute;
+            bottom: -35px;
+            width: 2px;
+            height: 35px;
+            background: white;
+        }
+
+        .typing-box {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
+        }
+
+        #wordInput {
+            width: 300px;
+            padding: 15px;
+            border: none;
+            border-radius: 12px;
+            outline: none;
+            font-size: 18px;
+            text-align: center;
+        }
+
+        .pop {
+            animation: pop 0.25s forwards;
+        }
+
+        @keyframes pop {
+            0% {
+                transform: scale(1);
+                opacity: 1;
+            }
+
+            100% {
+                transform: scale(1.6);
+                opacity: 0;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="game-header">
+
+        <h1>🎈 Balloon Typing Game</h1>
+
+        <div class="score">
+            Score: <span id="score">0</span>
+        </div>
+
+        <div class="score">
+            Wrong: <span id="wrongAttempts">0</span> / 5
+        </div>
+    </div>
+
+
+    </div>
+
+
+    <div class="game-area" id="gameArea">
+
+        <!-- Balloons will appear here -->
+
+    </div>
+
+
+    <div class="typing-box">
+
+        <input type="text" id="wordInput" placeholder="Type the word..." autocomplete="off">
+
+    </div>
+
+<script>
+
+    const gameArea = document.getElementById("gameArea");
+    const wordInput = document.getElementById("wordInput");
+    const scoreDisplay = document.getElementById("score");
+    const wrongAttemptsDisplay =
+        document.getElementById("wrongAttempts");
+
+
+    let score = 0;
+    let correctWords = 0;
+    let wrongAttempts = 0;
+    let gameOver = false;
+
+
+    const maxWrongAttempts = 5;
+
+
+    const words = [
+
+        "mouse", "school", "coding", "javascript", "student",
+        "program", "website", "internet", "software", "hardware",
+        "database", "network", "server", "browser", "mobile",
+        "laptop", "screen", "window", "button", "input",
+        "output", "function", "variable", "object", "string",
+        "number", "array", "method", "class", "project",
+        "college", "teacher", "friend", "family", "garden",
+        "flower", "tree", "water", "river", "mountain",
+        "forest", "ocean", "beach", "island", "animal",
+        "tiger", "lion", "horse", "rabbit", "bird",
+        "music", "movie", "story", "picture", "camera",
+        "phone", "message", "email", "account", "password"
+
+    ];
+
+
+    let usedWords = [];
+
+
+    function getNewWord() {
+
+        let availableWords =
+            words.filter(
+                word => !usedWords.includes(word)
+            );
+
+
+        if (availableWords.length === 0) {
+
+            usedWords = [];
+
+            availableWords = [...words];
+
+        }
+
+
+        const word =
+            availableWords[
+                Math.floor(
+                    Math.random() * availableWords.length
+                )
+            ];
+
+
+        usedWords.push(word);
+
+        return word;
+    }
+
+
+    const balloonColors = [
+
+        "#ff6b6b",
+        "#ff9f43",
+        "#54a0ff",
+        "#5f27cd",
+        "#1dd1a1"
+
+    ];
+
+
+    const balloons = [];
+
+
+    function createBalloon() {
+
+        if (gameOver) {
+            return;
+        }
+
+
+        const balloon =
+            document.createElement("div");
+
+        balloon.classList.add("balloon");
+
+
+        const word = getNewWord();
+
+        balloon.textContent = word;
+
+        balloon.dataset.word = word;
+
+
+        balloon.style.background =
+            balloonColors[
+                Math.floor(
+                    Math.random() *
+                    balloonColors.length
+                )
+            ];
+
+
+        const maxLeft =
+            gameArea.clientWidth - 120;
+
+
+        balloon.style.left =
+            Math.random() * maxLeft + "px";
+
+
+        balloon.style.top =
+            gameArea.clientHeight + "px";
+
+
+        gameArea.appendChild(balloon);
+
+
+        balloons.push({
+
+            element: balloon,
+
+            word: word,
+
+            y: gameArea.clientHeight,
+
+            speed:
+                0.25 +
+                Math.random() * 0.25
+
+        });
+
+    }
+
+
+    function moveBalloons() {
+
+        if (gameOver) {
+            return;
+        }
+
+
+        for (
+            let i = balloons.length - 1;
+            i >= 0;
+            i--
+        ) {
+
+            const balloon =
+                balloons[i];
+
+
+            balloon.y -=
+                balloon.speed;
+
+
+            balloon.element.style.top =
+                balloon.y + "px";
+
+
+            if (balloon.y < -150) {
+
+                balloon.element.remove();
+
+                balloons.splice(i, 1);
+
+                createBalloon();
+
+            }
+
+        }
+
+
+        requestAnimationFrame(moveBalloons);
+
+    }
+
+
+    function updateScore(points) {
+
+        score += points;
+
+        scoreDisplay.textContent =
+            score;
+
+    }
+
+
+    function wrongAttempt() {
+
+        if (gameOver) {
+            return;
+        }
+
+
+        wrongAttempts++;
+
+        updateScore(-5);
+
+
+        wrongAttemptsDisplay.textContent =
+            wrongAttempts;
+
+
+        wordInput.value = "";
+
+
+        if (wrongAttempts >= maxWrongAttempts) {
+
+            endGame();
+
+        }
+
+    }
+
+
+    function popBalloon(balloon) {
+
+        if (gameOver) {
+            return;
+        }
+
+
+        balloon.element.classList.add("pop");
+
+
+        updateScore(10);
+
+        correctWords++;
+
+
+        setTimeout(() => {
+
+            if (gameOver) {
+                return;
+            }
+
+
+            balloon.element.remove();
+
+
+            const index =
+                balloons.indexOf(balloon);
+
+
+            if (index !== -1) {
+
+                balloons.splice(
+                    index,
+                    1
+                );
+
+            }
+
+
+            createBalloon();
+
+
+        }, 250);
+
+    }
+
+
+    function endGame() {
+
+        if (gameOver) {
+            return;
+        }
+
+
+        gameOver = true;
+
+
+        wordInput.disabled = true;
+
+        wordInput.value = "";
+
+
+        balloons.forEach(balloon => {
+
+            balloon.element.remove();
+
+        });
+
+
+        balloons.length = 0;
+
+
+        const form =
+            document.createElement("form");
+
+
+        form.method = "POST";
+
+        form.action =
+            "/ballon_game/result_ballon_game";
+
+
+        const scoreInput =
+            document.createElement("input");
+
+        scoreInput.type = "hidden";
+
+        scoreInput.name = "score";
+
+        scoreInput.value = score;
+
+
+        const correctInput =
+            document.createElement("input");
+
+        correctInput.type = "hidden";
+
+        correctInput.name = "correct_words";
+
+        correctInput.value = correctWords;
+
+
+        const wrongInput =
+            document.createElement("input");
+
+        wrongInput.type = "hidden";
+
+        wrongInput.name = "wrong_words";
+
+        wrongInput.value = wrongAttempts;
+
+
+        form.appendChild(scoreInput);
+
+        form.appendChild(correctInput);
+
+        form.appendChild(wrongInput);
+
+
+        document.body.appendChild(form);
+
+
+        form.submit();
+
+    }
+
+
+    wordInput.addEventListener(
+        "input",
+        function () {
+
+            if (gameOver) {
+                return;
+            }
+
+
+            const typedWord =
+                wordInput.value
+                    .trim()
+                    .toLowerCase();
+
+
+            if (typedWord === "") {
+                return;
+            }
+
+
+            const matchingBalloon =
+                balloons.find(
+
+                    balloon =>
+                        balloon.word
+                            .toLowerCase() ===
+                        typedWord
+
+                );
+
+
+            if (matchingBalloon) {
+
+                popBalloon(
+                    matchingBalloon
+                );
+
+
+                wordInput.value = "";
+
+                return;
+
+            }
+
+
+            const possibleWord =
+                balloons.some(
+
+                    balloon =>
+                        balloon.word
+                            .toLowerCase()
+                            .startsWith(
+                                typedWord
+                            )
+
+                );
+
+
+            if (!possibleWord) {
+
+                wrongAttempt();
+
+            }
+
+        }
+    );
+
+
+    // Create 5 balloons
+
+    for (
+        let i = 0;
+        i < 5;
+        i++
+    ) {
+
+        createBalloon();
+
+    }
+
+
+    moveBalloons();
+
+
+    wordInput.focus();
+
+</script>
+
+</body>
+
+</html>

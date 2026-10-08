@@ -1,0 +1,294 @@
+<!-- <h1>Edit Profile</h1>
+
+<form method="POST">
+
+    <label>Name:</label>
+
+    <input type="text"
+           name="name"
+           value="{{ user[1] }}"
+           required>
+
+    <br><br>
+
+    <button type="submit">
+        Save Changes
+    </button>
+
+</form> -->
+
+
+
+
+
+
+
+
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>Edit Profile</title>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: linear-gradient(
+                135deg,
+                #2b3a67,
+                #465cc8,
+                #7388ff
+            );
+
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Floating background circles */
+
+        body::before,
+        body::after {
+            content: "";
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(2px);
+            opacity: 0.18;
+        }
+
+        body::before {
+            width: 300px;
+            height: 300px;
+            background: #9faeff;
+            top: -100px;
+            left: -80px;
+        }
+
+        body::after {
+            width: 350px;
+            height: 350px;
+            background: #b8c1ff;
+            bottom: -150px;
+            right: -100px;
+        }
+
+        /* Main card */
+
+        .profile-card {
+            width: 430px;
+            padding: 40px;
+
+            background: rgba(255, 255, 255, 0.13);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 25px;
+
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+
+            box-shadow:
+                0 20px 50px rgba(0, 0, 0, 0.25),
+                0 0 25px rgba(130, 150, 255, 0.25);
+
+            position: relative;
+            z-index: 2;
+        }
+
+        /* Heading */
+
+        h1 {
+            text-align: center;
+            color: white;
+            font-size: 30px;
+            font-weight: 700;
+            margin-bottom: 10px;
+
+            text-shadow:
+                0 0 8px rgba(255, 255, 255, 0.4),
+                0 0 18px rgba(120, 150, 255, 0.5);
+        }
+
+        .subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.75);
+            font-size: 14px;
+            margin-bottom: 30px;
+        }
+
+        /* Form */
+
+        form {
+            width: 100%;
+        }
+
+        label {
+            display: block;
+            color: white;
+            font-size: 14px;
+            font-weight: 500;
+            margin-bottom: 9px;
+        }
+
+        input {
+            width: 100%;
+            padding: 14px 16px;
+
+            border: 1px solid rgba(255, 255, 255, 0.25);
+            border-radius: 12px;
+
+            background: rgba(255, 255, 255, 0.10);
+            color: white;
+
+            font-family: 'Poppins', sans-serif;
+            font-size: 14px;
+
+            outline: none;
+
+            transition: 0.3s ease;
+        }
+
+        input::placeholder {
+            color: rgba(255, 255, 255, 0.55);
+        }
+
+        input:focus {
+            border-color: rgba(255, 255, 255, 0.65);
+
+            background: rgba(255, 255, 255, 0.15);
+
+            box-shadow:
+                0 0 10px rgba(140, 160, 255, 0.45),
+                0 0 20px rgba(140, 160, 255, 0.20);
+        }
+
+        /* Button */
+
+        button {
+            width: 100%;
+            margin-top: 25px;
+            padding: 14px;
+
+            border: none;
+            border-radius: 12px;
+
+            background: linear-gradient(
+                135deg,
+                #6577ff,
+                #8998ff
+            );
+
+            color: white;
+
+            font-family: 'Poppins', sans-serif;
+            font-size: 15px;
+            font-weight: 600;
+
+            cursor: pointer;
+
+            box-shadow:
+                0 8px 20px rgba(50, 70, 180, 0.35),
+                0 0 12px rgba(130, 150, 255, 0.35);
+
+            transition: 0.3s ease;
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+
+            box-shadow:
+                0 10px 25px rgba(50, 70, 180, 0.45),
+                0 0 20px rgba(150, 170, 255, 0.55);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        /* Small profile icon */
+
+        .profile-icon {
+            width: 70px;
+            height: 70px;
+            margin: 0 auto 18px;
+
+            border-radius: 50%;
+
+            display: flex;
+            justify-content: center;
+            align-items: center;
+
+            background: rgba(255, 255, 255, 0.14);
+            border: 1px solid rgba(255, 255, 255, 0.25);
+
+            font-size: 30px;
+
+            box-shadow:
+                0 0 20px rgba(150, 170, 255, 0.35);
+        }
+
+        /* Responsive */
+
+        @media (max-width: 500px) {
+
+            .profile-card {
+                width: 90%;
+                padding: 30px 25px;
+            }
+
+            h1 {
+                font-size: 26px;
+            }
+        }
+
+    </style>
+</head>
+
+<body>
+
+<div class="profile-card">
+
+    <div class="profile-icon">
+        👤
+    </div>
+
+    <h1>Edit Profile</h1>
+
+    <p class="subtitle">
+        Update your profile information
+    </p>
+
+    <form method="POST">
+
+        <label>Name:</label>
+
+        <input type="text"
+               name="name"
+               value="{{ user[1] }}"
+               required>
+
+        <button type="submit">
+            Save Changes
+        </button>
+
+    </form>
+
+</div>
+
+</body>
+</html>

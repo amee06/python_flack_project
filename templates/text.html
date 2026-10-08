@@ -1,3 +1,4 @@
+
 <style>
     * {
         margin: 0;
@@ -15,7 +16,9 @@
         overflow: hidden;
     }
 
-    /* Background Circles */
+    /* =========================
+       Background Circles
+    ========================= */
 
     body::before {
         content: "";
@@ -39,6 +42,10 @@
         right: -100px;
     }
 
+    /* =========================
+       Main Container
+    ========================= */
+
     .container {
         width: 900px;
         background: rgba(255, 255, 255, .12);
@@ -48,6 +55,10 @@
         box-shadow: 0 15px 35px rgba(0, 0, 0, .3);
         color: white;
     }
+
+    /* =========================
+       Header
+    ========================= */
 
     .header {
         display: flex;
@@ -69,7 +80,9 @@
         box-shadow: 0 5px 15px rgba(255, 77, 109, .4);
     }
 
-    /* Paragraph */
+    /* =========================
+       Paragraph
+    ========================= */
 
     .paragraph {
         background: rgba(255, 255, 255, .15);
@@ -86,7 +99,9 @@
         overflow-y: auto;
     }
 
-    /* Individual words */
+    /* =========================
+       Individual Words
+    ========================= */
 
     .word {
         display: inline-block;
@@ -96,33 +111,37 @@
         transition: all 0.15s ease;
     }
 
-    /* Current word */
+    /* Current Word */
 
     .word.current {
         background: rgba(255, 255, 255, 0.25);
         box-shadow: 0 0 10px rgba(255, 255, 255, 0.3);
     }
 
-    /* Correct word */
+    /* Correct Word */
 
     .word.correct {
         color: #39ff88;
         background: rgba(57, 255, 136, 0.12);
     }
 
-    /* Wrong word */
+    /* Wrong Word */
 
     .word.wrong {
         color: #ff4d6d;
         background: rgba(255, 77, 109, 0.15);
     }
 
-    /* Current word when typing */
+    /* Current Word While Typing */
 
     .word.typing {
         color: #ffd43b;
         background: rgba(255, 212, 59, 0.15);
     }
+
+    /* =========================
+       Textarea
+    ========================= */
 
     textarea {
         width: 100%;
@@ -149,6 +168,10 @@
         box-shadow: 0 0 0 3px rgba(255, 212, 59, 0.5);
     }
 
+    /* =========================
+       Submit Button
+    ========================= */
+
     button {
         width: 100%;
         padding: 16px;
@@ -168,7 +191,13 @@
 </style>
 
 
+<!-- =========================
+     Main Container
+========================= -->
+
 <div class="container">
+
+    <!-- Header -->
 
     <div class="header">
 
@@ -181,13 +210,19 @@
     </div>
 
 
+    <!-- =========================
+         Typing Form
+    ========================= -->
+
     <form action="/result" method="POST" id="typingForm">
 
         <!-- Paragraph -->
+
         <div class="paragraph" id="paragraph"></div>
 
 
-        <!-- Typing area -->
+        <!-- Typing Area -->
+
         <textarea
             id="typingArea"
             name="typed_text"
@@ -196,17 +231,29 @@
             autocorrect="off"
             autocapitalize="off"
             spellcheck="false"
-            required></textarea>
+            required
+        ></textarea>
 
 
-        <input type="hidden"
-               name="paragraph"
-               value="{{ paragraph }}">
+        <!-- Hidden Paragraph -->
 
-        <input type="hidden"
-               name="duration"
-               value="{{ duration }}">
+        <input
+            type="hidden"
+            name="paragraph"
+            value="{{ paragraph }}"
+        >
 
+
+        <!-- Hidden Duration -->
+
+        <input
+            type="hidden"
+            name="duration"
+            value="{{ duration }}"
+        >
+
+
+        <!-- Submit Button -->
 
         <button type="submit">
             🚀 Submit Test
@@ -219,58 +266,42 @@
 
 <script>
 
-    /* =====================================================
-       GET ORIGINAL PARAGRAPH
-    ===================================================== */
+    /* =========================
+       PARAGRAPH
+    ========================= */
 
     const originalText = {{ paragraph | tojson }};
 
-
-    /* =====================================================
-       CREATE WORDS
-    ===================================================== */
-
     const paragraphElement = document.getElementById("paragraph");
+    const typingArea = document.getElementById("typingArea");
+    const timer = document.getElementById("timer");
+    const typingForm = document.getElementById("typingForm");
 
     const originalWords = originalText.trim().split(/\s+/);
+
+
+    /* Create paragraph words */
 
     originalWords.forEach(function(word, index) {
 
         const span = document.createElement("span");
 
-        span.classList.add("word");
-
+        span.className = "word";
         span.textContent = word;
-
         span.dataset.index = index;
 
         paragraphElement.appendChild(span);
 
     });
 
-
-    const wordElements =
-        document.querySelectorAll(".word");
+    const wordElements = document.querySelectorAll(".word");
 
 
-    /* =====================================================
-       TYPING AREA
-    ===================================================== */
-
-    const typingArea =
-        document.getElementById("typingArea");
-
-
-    /* =====================================================
+    /* =========================
        PREVENT GOING BACK
-    ===================================================== */
+    ========================= */
 
     typingArea.addEventListener("keydown", function(event) {
-
-        /*
-         * These keys can move the cursor backward
-         * or delete previous text.
-         */
 
         const forbiddenKeys = [
             "Backspace",
@@ -283,212 +314,97 @@
             "End"
         ];
 
+        const forbiddenCtrlKeys = ["a", "x", "v", "z"];
 
-        if (forbiddenKeys.includes(event.key)) {
 
+        if (
+            forbiddenKeys.includes(event.key) ||
+            (
+                event.ctrlKey &&
+                forbiddenCtrlKeys.includes(event.key.toLowerCase())
+            )
+        ) {
             event.preventDefault();
-
-            return;
-
-        }
-
-
-        /*
-         * Prevent Ctrl+A
-         */
-
-        if (event.ctrlKey && event.key.toLowerCase() === "a") {
-
-            event.preventDefault();
-
-            return;
-
-        }
-
-
-        /*
-         * Prevent Ctrl+X
-         */
-
-        if (event.ctrlKey && event.key.toLowerCase() === "x") {
-
-            event.preventDefault();
-
-            return;
-
-        }
-
-
-        /*
-         * Prevent Ctrl+V
-         */
-
-        if (event.ctrlKey && event.key.toLowerCase() === "v") {
-
-            event.preventDefault();
-
-            return;
-
-        }
-
-
-        /*
-         * Prevent Ctrl+Z
-         */
-
-        if (event.ctrlKey && event.key.toLowerCase() === "z") {
-
-            event.preventDefault();
-
-            return;
-
         }
 
     });
 
 
-    /* =====================================================
-       PREVENT PASTE
-    ===================================================== */
+    /* Prevent paste and cut */
 
     typingArea.addEventListener("paste", function(event) {
-
         event.preventDefault();
-
     });
-
-
-    /* =====================================================
-       PREVENT CUT
-    ===================================================== */
 
     typingArea.addEventListener("cut", function(event) {
-
         event.preventDefault();
-
     });
 
 
-    /* =====================================================
+    /* =========================
        CHECK TYPING
-    ===================================================== */
+    ========================= */
 
     typingArea.addEventListener("input", function() {
 
         const typedText = typingArea.value;
 
-
-        /*
-         * Get typed words
-         */
-
-        const typedWords =
-            typedText.trim().split(/\s+/);
-
-
-        /*
-         * If textarea is empty
-         */
-
         if (typedText.trim() === "") {
 
             wordElements.forEach(function(word) {
-
                 word.className = "word";
-
             });
 
             return;
-
         }
 
 
-        /*
-         * Find current word
-         */
+        const typedWords = typedText.trim().split(/\s+/);
 
-        let currentIndex = typedWords.length - 1;
+        const currentIndex = typedWords.length - 1;
 
-
-        /*
-         * Check every typed word
-         */
 
         wordElements.forEach(function(wordElement, index) {
 
             wordElement.className = "word";
 
 
-            /*
-             * Word has already been completed
-             */
+            /* Already typed words */
 
             if (index < currentIndex) {
 
                 if (typedWords[index] === originalWords[index]) {
-
                     wordElement.classList.add("correct");
-
                 } else {
-
                     wordElement.classList.add("wrong");
-
                 }
 
             }
 
 
-            /*
-             * Current word
-             */
+            /* Current word */
 
             else if (index === currentIndex) {
 
-                const typedWord =
-                    typedWords[index];
+                const typedWord = typedWords[index];
+                const originalWord = originalWords[index];
 
-                const originalWord =
-                    originalWords[index];
-
-
-                /*
-                 * Exact match
-                 */
 
                 if (typedWord === originalWord) {
 
                     wordElement.classList.add("correct");
 
                 }
-
-
-                /*
-                 * User is typing the correct word
-                 */
-
-                else if (
-                    originalWord.startsWith(typedWord)
-                ) {
+                else if (originalWord.startsWith(typedWord)) {
 
                     wordElement.classList.add("typing");
 
                 }
-
-
-                /*
-                 * Wrong word
-                 */
-
                 else {
 
                     wordElement.classList.add("wrong");
 
                 }
-
-
-                /*
-                 * Highlight current word
-                 */
 
                 wordElement.classList.add("current");
 
@@ -497,9 +413,7 @@
         });
 
 
-        /*
-         * Scroll current word into view
-         */
+        /* Scroll to current word */
 
         if (wordElements[currentIndex]) {
 
@@ -513,87 +427,65 @@
     });
 
 
-    /* =====================================================
+    /* =========================
        KEEP CURSOR AT END
-    ===================================================== */
+    ========================= */
 
-    typingArea.addEventListener("click", function() {
-
-        typingArea.setSelectionRange(
-            typingArea.value.length,
-            typingArea.value.length
-        );
-
-    });
-
-
-    typingArea.addEventListener("mouseup", function() {
+    function moveCursorToEnd() {
 
         typingArea.setSelectionRange(
             typingArea.value.length,
             typingArea.value.length
         );
 
-    });
+    }
+
+    typingArea.addEventListener("click", moveCursorToEnd);
+    typingArea.addEventListener("mouseup", moveCursorToEnd);
 
 
-    /* =====================================================
+    /* =========================
        TIMER
-    ===================================================== */
+    ========================= */
 
     let time = Number("{{ duration }}") * 60;
 
-    const timer =
-        document.getElementById("timer");
 
+    function showTime() {
+
+        const minutes = Math.floor(time / 60);
+        const seconds = time % 60;
+
+        timer.innerHTML =
+            minutes + ":" +
+            (seconds < 10 ? "0" : "") +
+            seconds;
+
+    }
+
+
+    /* Show timer immediately */
+
+    showTime();
+
+
+    /* Start countdown */
 
     const countdown = setInterval(function() {
 
-        let min =
-            Math.floor(time / 60);
-
-        let sec =
-            time % 60;
-
-
-        timer.innerHTML =
-            min + ":" +
-            (sec < 10 ? "0" : "") +
-            sec;
-
-
         time--;
-
-
-        /*
-         * Time finished
-         */
 
         if (time < 0) {
 
             clearInterval(countdown);
+            typingForm.submit();
 
-            document.getElementById("typingForm").submit();
+            return;
 
         }
 
+        showTime();
+
     }, 1000);
-
-
-    /* =====================================================
-       START TIMER DISPLAY IMMEDIATELY
-    ===================================================== */
-
-    let initialMin =
-        Math.floor((Number("{{ duration }}") * 60) / 60);
-
-    let initialSec =
-        (Number("{{ duration }}") * 60) % 60;
-
-    timer.innerHTML =
-        initialMin + ":" +
-        (initialSec < 10 ? "0" : "") +
-        initialSec;
-
 
 </script>

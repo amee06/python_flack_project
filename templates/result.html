@@ -72,23 +72,66 @@
             justify-content: space-between;
         }
 
-        .play-btn {
-            display: inline-block;
+        .buttons {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
             margin-top: 30px;
-            padding: 15px 40px;
+        }
+
+        .play-btn,
+        .profile-btn {
+            display: inline-block;
+            padding: 13px 25px;
+            color: white;
+            text-decoration: none;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 13px;
+            transition: .3s;
+        }
+
+        .play-btn {
             background: #FFD43B;
             color: #333;
-            text-decoration: none;
-            font-size: 20px;
-            font-weight: bold;
-            border-radius: 15px;
-            transition: .3s;
         }
 
         .play-btn:hover {
             background: #FFC107;
-            transform: scale(1.05);
+            transform: translateY(-3px);
             box-shadow: 0 0 20px rgba(255, 212, 59, .6);
+        }
+
+        .profile-btn {
+            background: rgba(255, 255, 255, .16);
+            border: 1px solid rgba(255, 255, 255, .25);
+        }
+
+        .profile-btn:hover {
+            background: rgba(255, 255, 255, .25);
+            transform: translateY(-3px);
+            box-shadow: 0 0 20px rgba(255, 255, 255, .15);
+        }
+
+        @media (max-width: 550px) {
+
+            .container {
+                width: 90%;
+                padding: 25px;
+            }
+
+            h1 {
+                font-size: 28px;
+            }
+
+            .buttons {
+                flex-direction: column;
+            }
+
+            .play-btn,
+            .profile-btn {
+                width: 100%;
+            }
         }
     </style>
 
@@ -120,9 +163,17 @@
             <span>{{ wpm }}</span>
         </div>
 
-        <a href="/dashboard" class="play-btn">
-            🔄 Play Again
-        </a>
+        <div class="buttons">
+
+            <a href="/dashboard" class="play-btn">
+                🔄 Play Again
+            </a>
+
+            <a href="/profile" class="profile-btn">
+                👤 Profile
+            </a>
+
+        </div>
 
     </div>
 
